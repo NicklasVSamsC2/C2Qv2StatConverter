@@ -44,6 +44,7 @@ type
     procedure ButtonFirebirdChangeDBClick(Sender: TObject);
     procedure ButtonNexusChangeDBClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
   var
@@ -77,8 +78,6 @@ begin
     YearCount := 1;
     IPAddress := '';
 
-    EditBoxIpAddress.SetFocus();
-
     FBDirLabel.Caption := FirebirdConnection.Params.Values['Database'];
     NXDirLabel.Caption := NexusDatabase.AliasPath;
 end;
@@ -90,6 +89,11 @@ begin
   begin
     ConvertButton.Click;
   end;
+end;
+
+procedure TMainForm.FormShow(Sender: TObject);
+begin
+    EditBoxIpAddress.SetFocus();
 end;
 
 procedure TMainForm.TransferTickets(NexusDBConnection: TnxDatabase; FirebirdConnection: TFDConnection);
@@ -170,13 +174,16 @@ begin
         finally
           NexusDepartmentInfoQuery.Free; // Free the department query
         end;
+
       finally
         FirebirdTicketQuery.Free; // Free the Firebird query
       end;
+
     finally
       NexusTicketMasterArchiveQuery.Free; // Free the NexusDB query
     end;
-    ShowMessage('Data transfer completed successfully.');
+
+    ShowMessage('Data transfer on ' + IPAddress + ' completed.');
   except
     on E: Exception do
       ShowMessage('An error occurred: ' + E.Message);
@@ -188,6 +195,7 @@ var
     ChangeForm: TChangeDBDirectory;
 begin
   ChangeForm := TChangeDBDirectory.Create(Self);
+  ChangeForm.DirectoryPath.Text := NXDirLabel.Caption;
 
   try
     // Show the form modally
@@ -199,6 +207,7 @@ begin
   finally
     ChangeForm.Free;
   end;
+  EditBoxIpAddress.SetFocus();
 end;
 
 procedure TMainForm.ButtonNexusChangeDBClick(Sender: TObject);
@@ -206,6 +215,7 @@ var
     ChangeForm: TChangeDBDirectory;
 begin
   ChangeForm := TChangeDBDirectory.Create(Self);
+  ChangeForm.DirectoryPath.Text := NXDirLabel.Caption;
 
   try
     // Show the form modally
@@ -217,6 +227,7 @@ begin
   finally
     ChangeForm.Free;
   end;
+  EditBoxIpAddress.SetFocus();
 end;
 
 procedure TMainForm.ConvertButtonClick(Sender: TObject);

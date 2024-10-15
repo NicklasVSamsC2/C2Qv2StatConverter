@@ -15,27 +15,37 @@ uses
 
 type
   TMainForm = class(TForm)
+    // Firebird component
     FirebirdConnection: TFDConnection;
-
-    NexusDatabase: TnxDatabase;
-
-    NexusDepartmentInfoQuery: TnxQuery;
-    NexusTicketMasterArchiveQuery: TnxQuery;
     FirebirdTicketQuery: TFDQuery;
 
-    ConvertButton: TButton;
-    DropDownYears: TComboBox;
-    StaticText2: TStaticText;
-    NexusRemoteEngine: TnxRemoteServerEngine;
+    // Nexus component
     nxSqlEngine1: TnxSqlEngine;
     nxSession1: TnxSession;
     NexusTransport: TnxWinsockTransport;
-    EditBoxIPAddress: TEdit;
-    StaticText1: TStaticText;
+    NexusRemoteEngine: TnxRemoteServerEngine;
+    NexusDatabase: TnxDatabase;
+    NexusDepartmentInfoQuery: TnxQuery;
+    NexusTicketMasterArchiveQuery: TnxQuery;
+
+    // Button
+    ConvertButton: TButton;
     ButtonFirebirdChangeDB: TButton;
     ButtonNexusChangeDB: TButton;
+
+    // Dropdown
+    DropDownYears: TComboBox;
+
+    // Static text
+    StaticText1: TStaticText;
+    StaticText2: TStaticText;
+
+    // Label
     FBDirLabel: TLabel;
     NXDirLabel: TLabel;
+
+    // Edit box
+    EditBoxIPAddress: TEdit;
 
     procedure FormCreate(Sender: TObject);
     procedure TransferTickets(NexusDBConnection: TnxDatabase; FirebirdConnection: TFDConnection);
@@ -195,6 +205,7 @@ var
     ChangeForm: TChangeDBDirectory;
 begin
   ChangeForm := TChangeDBDirectory.Create(Self);
+  ChangeForm.DirectoryPath.Text := NXDirLabel.Caption;
 
   try
     // Show the form modally
@@ -206,6 +217,7 @@ begin
   finally
     ChangeForm.Free;
   end;
+  EditBoxIpAddress.SetFocus();
 end;
 
 procedure TMainForm.ButtonNexusChangeDBClick(Sender: TObject);
@@ -213,6 +225,7 @@ var
     ChangeForm: TChangeDBDirectory;
 begin
   ChangeForm := TChangeDBDirectory.Create(Self);
+  ChangeForm.DirectoryPath.Text := NXDirLabel.Caption;
 
   try
     // Show the form modally
@@ -224,6 +237,7 @@ begin
   finally
     ChangeForm.Free;
   end;
+  EditBoxIpAddress.SetFocus();
 end;
 
 procedure TMainForm.ConvertButtonClick(Sender: TObject);

@@ -15,28 +15,39 @@ uses
 
 type
   TMainForm = class(TForm)
+    // Firebird component
     FirebirdConnection: TFDConnection;
-
-    NexusDatabase: TnxDatabase;
-
-    NexusDepartmentInfoQuery: TnxQuery;
-    NexusTicketMasterArchiveQuery: TnxQuery;
     FirebirdTicketQuery: TFDQuery;
 
-    ConvertButton: TButton;
-    DropDownYears: TComboBox;
-    StaticText2: TStaticText;
-    NexusRemoteEngine: TnxRemoteServerEngine;
+    // Nexus component
     nxSqlEngine1: TnxSqlEngine;
     nxSession1: TnxSession;
     NexusTransport: TnxWinsockTransport;
-    EditBoxIPAddress: TEdit;
-    StaticText1: TStaticText;
+    NexusRemoteEngine: TnxRemoteServerEngine;
+    NexusDatabase: TnxDatabase;
+    NexusDepartmentInfoQuery: TnxQuery;
+    NexusTicketMasterArchiveQuery: TnxQuery;
+
+    // Button
+    ConvertButton: TButton;
     ButtonFirebirdChangeDB: TButton;
     ButtonNexusChangeDB: TButton;
+
+    // Dropdown
+    DropDownYears: TComboBox;
+
+    // Static text
+    StaticText1: TStaticText;
+    StaticText2: TStaticText;
+
+    // Label
     FBDirLabel: TLabel;
     NXDirLabel: TLabel;
 
+    // Edit box
+    EditBoxIPAddress: TEdit;
+
+    // Procedure declarations
     procedure FormCreate(Sender: TObject);
     procedure TransferTickets(NexusDBConnection: TnxDatabase; FirebirdConnection: TFDConnection);
     procedure ConvertButtonClick(Sender: TObject);
@@ -68,6 +79,7 @@ end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
+    // Add items to drop down box
     DropDownYears.Items.Add('1');
     DropDownYears.Items.Add('2');
     DropDownYears.Items.Add('3');
@@ -75,13 +87,16 @@ begin
     DropDownYears.Items.Add('5');
     DropDownYears.ItemIndex := 0;
 
+    // Variables for the form
     YearCount := 1;
     IPAddress := '';
 
+    // Label captions
     FBDirLabel.Caption := FirebirdConnection.Params.Values['Database'];
     NXDirLabel.Caption := NexusDatabase.AliasPath;
 end;
 
+// If RETURN is pressed, the ConvertButton click event will fire
 procedure TMainForm.FormKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
@@ -91,11 +106,14 @@ begin
   end;
 end;
 
+// When the main form is loaded, focus the IP Address field
 procedure TMainForm.FormShow(Sender: TObject);
 begin
     EditBoxIpAddress.SetFocus();
 end;
 
+// Main functionality of the program
+// Will pull out data from the Nexus Database and convert it to be inserted into the Firebird database
 procedure TMainForm.TransferTickets(NexusDBConnection: TnxDatabase; FirebirdConnection: TFDConnection);
 var
     QueueModelId: Integer;
@@ -115,13 +133,13 @@ begin
       NexusTicketMasterArchiveQuery.Params.ParamByName('YearsAgo').AsDateTime := YearsAgo;
       NexusTicketMasterArchiveQuery.Open;
 
-      // Initialize Firebird query to insert data
+      // Initialize Firebird query to insert data into C2QTicket table
       FirebirdTicketQuery := TFDQuery.Create(nil);
       try
         FirebirdTicketQuery.Connection := FirebirdConnection;
 
         // Insert new data into the database if the ticket doesn't already exist
-        // This allows to add more years after first conversion
+        // This allows to add more years after first conversion and avoids duplicate entries
         FirebirdTicketQuery.SQL.Text := 'INSERT INTO C2QTicket (TicketNumber, PosNumber, TicketDrawn, TicketCalled, TicketFinished, DepartmentId, QueueModelId) ' +
                                 'SELECT :TicketNumber, :PosNumber, :TicketDrawn, :TicketCalled, :TicketFinished, :DepartmentId, :QueueModelId ' +
                                 'FROM RDB$DATABASE ' +
@@ -143,12 +161,13 @@ begin
             NexusDepartmentInfoQuery.Open;
 
             // Determine the QueueModelId based on DeptText
+            // WARNING: This might fail if we encounter incorrect spelling.
             if not NexusDepartmentInfoQuery.IsEmpty then
             begin
               if NexusDepartmentInfoQuery.FieldByName('DeptText').AsString = 'Recept' then
                 QueueModelId := 2
               else
-                QueueModelId := 1; // Default value for other DeptText
+                QueueModelId := 1; // Default value
             end
             else
               QueueModelId := 1; // Default if DeptNumber not found
@@ -190,6 +209,8 @@ begin
   end;
 end;
 
+// Modal unit shown to change the directory where the database files are
+// The default values should be sufficient, but this was implemented in case we ran into issues
 procedure TMainForm.ButtonFirebirdChangeDBClick(Sender: TObject);
 var
     ChangeForm: TChangeDBDirectory;
@@ -201,15 +222,18 @@ begin
     // Show the form modally
     if ChangeForm.ShowModal = mrOk then
     begin
+      // Map the new directory to the label and Firebird Connection
       FBDirLabel.Caption := ChangeForm.DirectoryPath.Text;
       FirebirdConnection.Params.Values['Database'] := ChangeForm.DirectoryPath.Text;
     end
   finally
     ChangeForm.Free;
   end;
+  // Refocus the IP Address field
   EditBoxIpAddress.SetFocus();
 end;
 
+// See comments on above procedure (Yes, this should probably be refactored into one function)
 procedure TMainForm.ButtonNexusChangeDBClick(Sender: TObject);
 var
     ChangeForm: TChangeDBDirectory;
@@ -218,7 +242,6 @@ begin
   ChangeForm.DirectoryPath.Text := NXDirLabel.Caption;
 
   try
-    // Show the form modally
     if ChangeForm.ShowModal = mrOk then
     begin
       NXDirLabel.Caption := ChangeForm.DirectoryPath.Text;
@@ -230,6 +253,7 @@ begin
   EditBoxIpAddress.SetFocus();
 end;
 
+// Sets IP Address for server connections and runs the TransferTickets procedure
 procedure TMainForm.ConvertButtonClick(Sender: TObject);
   begin
     IPAddress := EditBoxIPAddress.Text;
@@ -239,7 +263,6 @@ procedure TMainForm.ConvertButtonClick(Sender: TObject);
           NexusTransport.ServerName := IPAddress;
           FirebirdConnection.Params.Values['Server'] := IPAddress;
         finally
-          NexusDatabase.Connected := True;
           TransferTickets(NexusDatabase, FirebirdConnection);
         end
     else

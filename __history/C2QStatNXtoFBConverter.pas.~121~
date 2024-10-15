@@ -16,26 +16,29 @@ uses
 type
   TMainForm = class(TForm)
     FirebirdConnection: TFDConnection;
-
-    NexusDatabase: TnxDatabase;
-
-    NexusDepartmentInfoQuery: TnxQuery;
-    NexusTicketMasterArchiveQuery: TnxQuery;
     FirebirdTicketQuery: TFDQuery;
 
-    ConvertButton: TButton;
-    DropDownYears: TComboBox;
-    StaticText2: TStaticText;
-    NexusRemoteEngine: TnxRemoteServerEngine;
     nxSqlEngine1: TnxSqlEngine;
     nxSession1: TnxSession;
     NexusTransport: TnxWinsockTransport;
-    EditBoxIPAddress: TEdit;
-    StaticText1: TStaticText;
+    NexusRemoteEngine: TnxRemoteServerEngine;
+    NexusDatabase: TnxDatabase;
+    NexusDepartmentInfoQuery: TnxQuery;
+    NexusTicketMasterArchiveQuery: TnxQuery;
+
+    ConvertButton: TButton;
     ButtonFirebirdChangeDB: TButton;
     ButtonNexusChangeDB: TButton;
+
+    DropDownYears: TComboBox;
+
+    StaticText1: TStaticText;
+    StaticText2: TStaticText;
+
     FBDirLabel: TLabel;
     NXDirLabel: TLabel;
+
+    EditBoxIPAddress: TEdit;
 
     procedure FormCreate(Sender: TObject);
     procedure TransferTickets(NexusDBConnection: TnxDatabase; FirebirdConnection: TFDConnection);
@@ -44,6 +47,7 @@ type
     procedure ButtonFirebirdChangeDBClick(Sender: TObject);
     procedure ButtonNexusChangeDBClick(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
   var
@@ -77,8 +81,6 @@ begin
     YearCount := 1;
     IPAddress := '';
 
-    EditBoxIpAddress.SetFocus();
-
     FBDirLabel.Caption := FirebirdConnection.Params.Values['Database'];
     NXDirLabel.Caption := NexusDatabase.AliasPath;
 end;
@@ -90,6 +92,11 @@ begin
   begin
     ConvertButton.Click;
   end;
+end;
+
+procedure TMainForm.FormShow(Sender: TObject);
+begin
+    EditBoxIpAddress.SetFocus();
 end;
 
 procedure TMainForm.TransferTickets(NexusDBConnection: TnxDatabase; FirebirdConnection: TFDConnection);
@@ -179,7 +186,7 @@ begin
       NexusTicketMasterArchiveQuery.Free; // Free the NexusDB query
     end;
 
-    ShowMessage('Data transfer completed.');
+    ShowMessage('Data transfer on ' + IPAddress + ' completed.');
   except
     on E: Exception do
       ShowMessage('An error occurred: ' + E.Message);
@@ -191,6 +198,7 @@ var
     ChangeForm: TChangeDBDirectory;
 begin
   ChangeForm := TChangeDBDirectory.Create(Self);
+  ChangeForm.DirectoryPath.Text := NXDirLabel.Caption;
 
   try
     // Show the form modally
@@ -202,6 +210,7 @@ begin
   finally
     ChangeForm.Free;
   end;
+  EditBoxIpAddress.SetFocus();
 end;
 
 procedure TMainForm.ButtonNexusChangeDBClick(Sender: TObject);
@@ -209,6 +218,7 @@ var
     ChangeForm: TChangeDBDirectory;
 begin
   ChangeForm := TChangeDBDirectory.Create(Self);
+  ChangeForm.DirectoryPath.Text := NXDirLabel.Caption;
 
   try
     // Show the form modally
@@ -220,6 +230,7 @@ begin
   finally
     ChangeForm.Free;
   end;
+  EditBoxIpAddress.SetFocus();
 end;
 
 procedure TMainForm.ConvertButtonClick(Sender: TObject);
