@@ -1,0 +1,145 @@
+object MainForm: TMainForm
+  Left = 0
+  Top = 0
+  Caption = 'C2Q Ticket Converter'
+  ClientHeight = 168
+  ClientWidth = 329
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  OnCreate = FormCreate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object ConvertButton: TButton
+    Left = 135
+    Top = 108
+    Width = 145
+    Height = 52
+    Caption = 'Convert data'
+    TabOrder = 0
+    OnClick = ConvertButtonClick
+  end
+  object DropDownYears: TComboBox
+    Left = 135
+    Top = 81
+    Width = 145
+    Height = 21
+    TabOrder = 1
+    OnChange = DropDownYearsChange
+  end
+  object StaticText2: TStaticText
+    Left = 135
+    Top = 58
+    Width = 175
+    Height = 17
+    Caption = 'Choose number of years to convert'
+    TabOrder = 2
+  end
+  object EditBoxIPAddress: TEdit
+    Left = 135
+    Top = 31
+    Width = 145
+    Height = 21
+    TabOrder = 3
+  end
+  object StaticText1: TStaticText
+    Left = 135
+    Top = 8
+    Width = 186
+    Height = 17
+    Caption = 'Input IP address on server to convert'
+    TabOrder = 4
+  end
+  object ButtonFirebirdChangeDB: TButton
+    Left = 8
+    Top = 31
+    Width = 89
+    Height = 33
+    Caption = 'Change FB dir'
+    TabOrder = 5
+  end
+  object ButtonNexusChangeDB: TButton
+    Left = 8
+    Top = 89
+    Width = 89
+    Height = 34
+    Caption = 'Change NX dir'
+    TabOrder = 6
+  end
+  object FBDirText: TStaticText
+    Left = 8
+    Top = 8
+    Width = 4
+    Height = 4
+    TabOrder = 7
+  end
+  object NXDirText: TStaticText
+    Left = 8
+    Top = 66
+    Width = 4
+    Height = 4
+    TabOrder = 8
+  end
+  object FirebirdConnection: TFDConnection
+    Params.Strings = (
+      'DriverID=FB'
+      'Database=D:\C2Data\CITO.FDB'
+      'User_Name=C2APP'
+      'Port=3050'
+      'Password=C1t00wns'
+      'OSAuthent=No'
+      'RoleName=C2APP')
+    Left = 192
+    Top = 56
+  end
+  object NexusDatabase: TnxDatabase
+    Session = nxSession1
+    AliasPath = 'D:\Data\C2Q'
+    Left = 256
+    Top = 56
+  end
+  object NexusTableTicketMasterArchive: TnxTable
+    TableName = 'TicketMasterArchive'
+    Left = 200
+    Top = 8
+  end
+  object FirebirdTicketQuery: TFDQuery
+    Connection = FirebirdConnection
+    Left = 224
+    Top = 56
+  end
+  object NexusDepartmentInfoQuery: TnxQuery
+    Left = 280
+    Top = 8
+  end
+  object NexusTicketMasterArchiveQuery: TnxQuery
+    Left = 160
+    Top = 8
+  end
+  object NexusRemoteEngine: TnxRemoteServerEngine
+    Transport = NexusTransport
+    Left = 288
+    Top = 56
+  end
+  object nxSqlEngine1: TnxSqlEngine
+    StmtLogging = False
+    StmtLogTableName = 'QueryLog'
+    UseFieldCache = False
+    Left = 256
+    Top = 104
+  end
+  object nxSession1: TnxSession
+    ServerEngine = NexusRemoteEngine
+    Left = 240
+    Top = 8
+  end
+  object NexusTransport: TnxWinsockTransport
+    DisplayCategory = 'Transports'
+    Left = 288
+    Top = 104
+  end
+end
