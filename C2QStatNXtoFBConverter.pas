@@ -42,6 +42,9 @@ type
     procedure ConvertButtonClick(Sender: TObject);
     procedure DropDownYearsChange(Sender: TObject);
     procedure ButtonFirebirdChangeDBClick(Sender: TObject);
+    procedure ButtonNexusChangeDBClick(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
   var
@@ -73,11 +76,24 @@ begin
     DropDownYears.ItemIndex := 0;
 
     YearCount := 1;
-
     IPAddress := '';
 
     FBDirLabel.Caption := FirebirdConnection.Params.Values['Database'];
     NXDirLabel.Caption := NexusDatabase.AliasPath;
+end;
+
+procedure TMainForm.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_RETURN then
+  begin
+    ConvertButton.Click;
+  end;
+end;
+
+procedure TMainForm.FormShow(Sender: TObject);
+begin
+    EditBoxIpAddress.SetFocus();
 end;
 
 procedure TMainForm.TransferTickets(NexusDBConnection: TnxDatabase; FirebirdConnection: TFDConnection);
@@ -110,8 +126,10 @@ begin
                                 'SELECT :TicketNumber, :PosNumber, :TicketDrawn, :TicketCalled, :TicketFinished, :DepartmentId, :QueueModelId ' +
                                 'FROM RDB$DATABASE ' +
                                 'WHERE NOT EXISTS (SELECT 1 FROM C2QTicket WHERE TicketNumber = :TicketNumber)';
+
         // Initialize Department query to map DeptText
         NexusDepartmentInfoQuery := TnxQuery.Create(nil);
+
         try
           NexusDepartmentInfoQuery.Database := NexusDBConnection;
           NexusDepartmentInfoQuery.SQL.Text := 'SELECT DeptText FROM DepartmentInfo WHERE DeptNumber = :DeptNumber';
@@ -143,8 +161,8 @@ begin
             FirebirdTicketQuery.Params.ParamByName('TicketDrawn').AsDateTime := NexusTicketMasterArchiveQuery.FieldByName('TicketOut').AsDateTime;
             FirebirdTicketQuery.Params.ParamByName('TicketCalled').AsDateTime := NexusTicketMasterArchiveQuery.FieldByName('TicketCall').AsDateTime;
             FirebirdTicketQuery.Params.ParamByName('TicketFinished').AsDateTime := NexusTicketMasterArchiveQuery.FieldByName('TicketDone').AsDateTime;
-            FirebirdTicketQuery.Params.ParamByName('DepartmentId').AsInteger := 999999999; // Static value as specified
-            FirebirdTicketQuery.Params.ParamByName('QueueModelId').AsInteger := QueueModelId; // Set the calculated QueueModelId
+            FirebirdTicketQuery.Params.ParamByName('DepartmentId').AsInteger := 999999999; // Default value for main department
+            FirebirdTicketQuery.Params.ParamByName('QueueModelId').AsInteger := QueueModelId;
 
             // Execute the insert query
             FirebirdTicketQuery.ExecSQL;
@@ -156,13 +174,16 @@ begin
         finally
           NexusDepartmentInfoQuery.Free; // Free the department query
         end;
+
       finally
         FirebirdTicketQuery.Free; // Free the Firebird query
       end;
+
     finally
       NexusTicketMasterArchiveQuery.Free; // Free the NexusDB query
     end;
-    ShowMessage('Data transfer completed successfully.');
+
+    ShowMessage('Data transfer on ' + IPAddress + ' completed.');
   except
     on E: Exception do
       ShowMessage('An error occurred: ' + E.Message);
@@ -171,10 +192,42 @@ end;
 
 procedure TMainForm.ButtonFirebirdChangeDBClick(Sender: TObject);
 var
-    ChangeForm: TChangeDBDirectoryForm;
+    ChangeForm: TChangeDBDirectory;
 begin
-  ChangeForm := TChangeDBDirectoryForm.Create(Self);  
-  
+  ChangeForm := TChangeDBDirectory.Create(Self);
+  ChangeForm.DirectoryPath.Text := NXDirLabel.Caption;
+
+  try
+    // Show the form modally
+    if ChangeForm.ShowModal = mrOk then
+    begin
+      FBDirLabel.Caption := ChangeForm.DirectoryPath.Text;
+      FirebirdConnection.Params.Values['Database'] := ChangeForm.DirectoryPath.Text;
+    end
+  finally
+    ChangeForm.Free;
+  end;
+  EditBoxIpAddress.SetFocus();
+end;
+
+procedure TMainForm.ButtonNexusChangeDBClick(Sender: TObject);
+var
+    ChangeForm: TChangeDBDirectory;
+begin
+  ChangeForm := TChangeDBDirectory.Create(Self);
+  ChangeForm.DirectoryPath.Text := NXDirLabel.Caption;
+
+  try
+    // Show the form modally
+    if ChangeForm.ShowModal = mrOk then
+    begin
+      NXDirLabel.Caption := ChangeForm.DirectoryPath.Text;
+      NexusDatabase.AliasPath := ChangeForm.DirectoryPath.Text;
+    end
+  finally
+    ChangeForm.Free;
+  end;
+  EditBoxIpAddress.SetFocus();
 end;
 
 procedure TMainForm.ConvertButtonClick(Sender: TObject);

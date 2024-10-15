@@ -7,10 +7,12 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
 
 type
-  TChangeDBDirectoryForm = class(TForm)
+  TChangeDBDirectory = class(TForm)
     ConfirmButton: TButton;
     CancelButton: TButton;
-    Edit1: TEdit;
+    DirectoryPath: TEdit;
+    procedure FormShow(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { Private declarations }
   public
@@ -18,10 +20,29 @@ type
   end;
 
 var
-  ChangeDir: TChangeDBDirectoryForm;
+  ChangeDBDirectory: TChangeDBDirectory;
 
 implementation
 
 {$R *.dfm}
+
+procedure TChangeDBDirectory.FormKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
+begin
+  if Key = VK_RETURN then
+  begin
+    ConfirmButton.Click;
+  end;
+
+  if Key = VK_ESCAPE then
+  begin
+    CancelButton.Click;
+  end;
+end;
+
+procedure TChangeDBDirectory.FormShow(Sender: TObject);
+begin
+  DirectoryPath.SetFocus();
+end;
 
 end.

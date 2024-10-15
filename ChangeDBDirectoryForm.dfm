@@ -1,20 +1,26 @@
-object ChangeDirBox: TChangeDirBox
+object ChangeDBDirectory: TChangeDBDirectory
   Left = 0
   Top = 0
+  BorderStyle = bsDialog
   Caption = 'Change Directory'
-  ClientHeight = 75
-  ClientWidth = 200
+  ClientHeight = 65
+  ClientWidth = 210
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  FormStyle = fsStayOnTop
+  KeyPreview = True
   OldCreateOrder = False
+  Position = poScreenCenter
+  OnKeyDown = FormKeyDown
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object ConfirmButton: TButton
-    Left = 3
+    Left = 8
     Top = 35
     Width = 75
     Height = 25
@@ -23,7 +29,7 @@ object ChangeDirBox: TChangeDirBox
     TabOrder = 0
   end
   object CancelButton: TButton
-    Left = 117
+    Left = 127
     Top = 35
     Width = 75
     Height = 25
@@ -31,10 +37,10 @@ object ChangeDirBox: TChangeDirBox
     ModalResult = 2
     TabOrder = 1
   end
-  object Edit1: TEdit
-    Left = 3
+  object DirectoryPath: TEdit
+    Left = 8
     Top = 8
-    Width = 189
+    Width = 194
     Height = 21
     TabOrder = 2
     Text = 'New directory'

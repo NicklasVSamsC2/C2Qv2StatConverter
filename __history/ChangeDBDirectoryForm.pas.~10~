@@ -1,0 +1,33 @@
+unit ChangeDBDirectoryForm;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
+
+type
+  TChangeDBDirectory = class(TForm)
+    ConfirmButton: TButton;
+    CancelButton: TButton;
+    DirectoryPath: TEdit;
+    procedure FormShow(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  ChangeDBDirectory: TChangeDBDirectory;
+
+implementation
+
+{$R *.dfm}
+
+procedure TChangeDBDirectory.FormShow(Sender: TObject);
+begin
+  DirectoryPath.SetFocus();
+end;
+
+end.

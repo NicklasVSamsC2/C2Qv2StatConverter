@@ -1,6 +1,7 @@
 object MainForm: TMainForm
   Left = 0
   Top = 0
+  BorderStyle = bsDialog
   Caption = 'C2Q Ticket Converter'
   ClientHeight = 185
   ClientWidth = 353
@@ -10,8 +11,12 @@ object MainForm: TMainForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  KeyPreview = True
   OldCreateOrder = False
+  Position = poScreenCenter
   OnCreate = FormCreate
+  OnKeyDown = FormKeyDown
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object FBDirLabel: TLabel
@@ -63,9 +68,9 @@ object MainForm: TMainForm
   object StaticText1: TStaticText
     Left = 8
     Top = 8
-    Width = 186
+    Width = 184
     Height = 17
-    Caption = 'Input IP address on server to convert'
+    Caption = 'Input IP address of server to convert'
     TabOrder = 4
   end
   object ButtonFirebirdChangeDB: TButton
@@ -84,6 +89,7 @@ object MainForm: TMainForm
     Height = 34
     Caption = 'Change NX dir'
     TabOrder = 6
+    OnClick = ButtonNexusChangeDBClick
   end
   object FirebirdConnection: TFDConnection
     Params.Strings = (

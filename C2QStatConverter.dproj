@@ -98,7 +98,7 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="ChangeDBDirectoryForm.pas">
-            <Form>ChangeDirBox</Form>
+            <Form>ChangeDBDirectory</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Release">
